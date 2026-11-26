@@ -70,7 +70,8 @@
   const uid = () => Math.random().toString(36).slice(2, 9);
 
   /* ---------------- CONSTANTS ---------------- */
-  const STORE_KEY = 'discipline-v1';
+  const STORE_KEY = 'discipline-v2';
+  const LEGACY_KEY = 'discipline-v1'; // bản cũ có dữ liệu mẫu tự sinh — chỉ giữ lại cài đặt
   const DEFAULT_TASKS = [
     { id: 'wake', name: 'Thức dậy đúng giờ', emoji: '⏰' },
     { id: 'study', name: 'Học tập ≥ 4h', emoji: '📚' },
@@ -184,6 +185,21 @@
     };
   }
 
+  // Trạng thái trống: chưa có ngày nào, chuỗi = 0
+  function freshState(prev) {
+    return {
+      version: 2,
+      settings: { name: 'bro', theme: 'dark', studyGoal: 4, autoStudyTask: true, ...((prev && prev.settings) || {}) },
+      tasks: prev && Array.isArray(prev.tasks) && prev.tasks.length ? prev.tasks : DEFAULT_TASKS.map((t) => ({ ...t })),
+      days: {},
+      activities: [{ id: uid(), ts: Date.now(), type: 'system', text: 'Bắt đầu hành trình kỷ luật 🚀' }],
+      routine: prev && Array.isArray(prev.routine) ? prev.routine : DEFAULT_ROUTINE.map((r) => ({ ...r })),
+      missions: {},
+      unlocked: [],
+      streakResetAt: null,
+    };
+  }
+
   function load() {
     try {
       const raw = localStorage.getItem(STORE_KEY);
@@ -191,13 +207,18 @@
         const parsed = JSON.parse(raw);
         if (parsed && parsed.tasks && parsed.days) return normalize(parsed);
       }
-    } catch (e) { console.warn('Không đọc được dữ liệu, tạo dữ liệu mẫu.', e); }
-    const s = seedState();
-    s.unlocked = computeUnlocked(s).map((m) => m.id);
-    return s;
+      // Bản cũ (v1) tự sinh dữ liệu giả → bỏ dữ liệu ngày, giữ tên/mục/lịch sinh hoạt
+      const legacy = localStorage.getItem(LEGACY_KEY);
+      if (legacy) {
+        const old = JSON.parse(legacy);
+        localStorage.removeItem(LEGACY_KEY);
+        return freshState(old);
+      }
+    } catch (e) { console.warn('Không đọc được dữ liệu, bắt đầu mới.', e); }
+    return freshState();
   }
   function normalize(s) {
-    const base = seedState();
+    const base = freshState();
     return {
       ...base,
       ...s,
@@ -219,15 +240,18 @@
     return validDone(st, k).length * 2 + (d.checkedIn ? 2 : 0) + (dayRate(k, st) === 1 ? 3 : 0);
   };
 
+  // Ngày được tính vào chuỗi: đã điểm danh và điểm danh sau lần reset chuỗi gần nhất
+  const countsForStreak = (k, st = state) =>
+    isChecked(k, st) && (!st.streakResetAt || (st.days[k].checkedAt || 0) > st.streakResetAt);
   function currentStreak(st = state) {
     let d = today();
-    if (!isChecked(keyOf(d), st)) d = addDays(d, -1);
+    if (!countsForStreak(keyOf(d), st)) d = addDays(d, -1);
     let n = 0;
-    while (isChecked(keyOf(d), st)) { n++; d = addDays(d, -1); }
+    while (countsForStreak(keyOf(d), st)) { n++; d = addDays(d, -1); }
     return n;
   }
   function bestStreak(st = state) {
-    const keys = Object.keys(st.days).filter((k) => isChecked(k, st)).sort();
+    const keys = Object.keys(st.days).filter((k) => countsForStreak(k, st)).sort();
     let best = 0, run = 0, prev = null;
     for (const k of keys) {
       run = prev && keyOf(addDays(parseKey(prev), 1)) === k ? run + 1 : 1;
@@ -473,7 +497,7 @@
     const cs = currentStreak();
     $('#streakNum').textContent = cs;
     $('#bestStreak').textContent = Math.max(bestStreak(), cs);
-    $('#streakDelta').classList.toggle('hidden', !isChecked(tk));
+    $('#streakDelta').classList.toggle('hidden', !countsForStreak(tk));
     $('#streakQuote').textContent = '“ ' + MOTIVATION[cs % MOTIVATION.length].replace('{name}', state.settings.name || 'bro');
     const heroBtn = $('#heroBtn');
     heroBtn.classList.toggle('done', isChecked(tk));
@@ -727,7 +751,8 @@
         <div class="card kpi"><span class="kpi-ic ic-green">${icon('check')}</span><div><b>${t.perfect}</b><span>Ngày hoàn hảo (100%)</span></div></div>
         <div class="card kpi"><span class="kpi-ic ic-purple">${icon('star')}</span><div><b>${unlockedCount}/${MILESTONES.length}</b><span>Huy hiệu đã mở khóa</span></div></div>
       </div>
-      <h3 class="section-title">${icon('trophy')}Cột mốc</h3>
+      <div class="toolbar"><h3 class="section-title" style="margin:0 0 0 4px">${icon('trophy')}Cột mốc</h3><span class="spacer"></span>
+        <button class="btn btn-danger btn-sm" data-action="reset-streak">${icon('refresh')} Reset chuỗi</button></div>
       <div class="badges">
         ${MILESTONES.map((m) => {
           const v = milestoneValue(m);
@@ -797,6 +822,7 @@
             <div class="btn-row">
               <button class="btn btn-ghost btn-sm" data-action="export">${icon('download')} Xuất JSON</button>
               <button class="btn btn-ghost btn-sm" data-action="import">${icon('upload')} Nhập JSON</button>
+              <button class="btn btn-ghost btn-sm" data-action="reset-streak">${icon('flame')} Reset chuỗi</button>
               <button class="btn btn-ghost btn-sm" data-action="reset-sample">${icon('refresh')} Dữ liệu mẫu</button>
               <button class="btn btn-danger btn-sm" data-action="clear-all">${icon('trash')} Xóa toàn bộ</button>
             </div>
@@ -906,11 +932,16 @@
       if (!confirm('Thay toàn bộ dữ liệu hiện tại bằng dữ liệu mẫu?')) return;
       state = seedState(); state.unlocked = computeUnlocked(state).map((m) => m.id); commit(); toast('Đã nạp dữ liệu mẫu', 'info');
     },
+    'reset-streak': () => {
+      if (!confirm('Reset chuỗi kỷ luật và kỷ lục về 0?\nLịch sử điểm danh vẫn được giữ, chuỗi mới sẽ tính từ lần điểm danh tiếp theo.')) return;
+      state.streakResetAt = Date.now();
+      state.unlocked = computeUnlocked(state).map((m) => m.id);
+      log('system', 'Đã reset chuỗi kỷ luật về 0 🔄');
+      commit(); toast('Đã reset chuỗi. Bắt đầu lại nào! 💪', 'info', 'refresh');
+    },
     'clear-all': () => {
-      if (!confirm('Xóa TOÀN BỘ dữ liệu và bắt đầu lại từ đầu? Không thể hoàn tác.')) return;
-      const theme = state.settings.theme;
-      state = { version: 1, settings: { name: 'bro', theme, studyGoal: 4, autoStudyTask: true }, tasks: DEFAULT_TASKS.map((t) => ({ ...t })), days: {}, activities: [], routine: DEFAULT_ROUTINE.map((r) => ({ ...r })), missions: {}, unlocked: [] };
-      log('system', 'Bắt đầu hành trình kỷ luật mới 🚀');
+      if (!confirm('Xóa TOÀN BỘ dữ liệu (điểm danh, chuỗi, lịch sử, nhiệm vụ) và bắt đầu lại từ đầu? Không thể hoàn tác.')) return;
+      state = freshState({ settings: state.settings, tasks: state.tasks, routine: state.routine });
       commit(); toast('Đã xóa toàn bộ dữ liệu', 'info');
     },
   };
