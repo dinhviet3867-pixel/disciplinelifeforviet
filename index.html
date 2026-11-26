@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Discipline — Track. Improve. Grow.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@1,500;1,600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="app">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="#overview">
+      <svg class="brand-star" viewBox="0 0 64 64" aria-hidden="true">
+        <defs>
+          <linearGradient id="starGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#c4b5fd" />
+            <stop offset="1" stop-color="#6d28d9" />
+          </linearGradient>
+        </defs>
+        <path d="M32 1 L36 27 L63 32 L36 37 L32 63 L28 37 L1 32 L28 27 Z" fill="url(#starGrad)" />
+        <path d="M32 14 L34 30 L50 32 L34 34 L32 50 L30 34 L14 32 L30 30 Z" fill="#ede9fe" opacity=".85" />
+        <circle cx="32" cy="32" r="3" fill="#fff" />
+      </svg>
+      <div>
+        <div class="brand-name">Discipline</div>
+        <div class="brand-tag">TRACK. IMPROVE. GROW.</div>
+      </div>
+    </a>
+
+    <nav class="nav" id="nav">
+      <a href="#overview" data-route="overview"><i data-icon="home"></i><span>Tổng quan</span></a>
+      <a href="#schedule" data-route="schedule"><i data-icon="calendar"></i><span>Lịch trình</span></a>
+      <a href="#stats" data-route="stats"><i data-icon="bars"></i><span>Thống kê</span></a>
+      <a href="#achievements" data-route="achievements"><i data-icon="trophy"></i><span>Thành tựu</span></a>
+      <a href="#activity" data-route="activity"><i data-icon="history"></i><span>Hoạt động</span></a>
+      <a href="#settings" data-route="settings"><i data-icon="settings"></i><span>Cài đặt</span></a>
+    </nav>
+
+    <div class="side-card">
+      <svg class="mountains" viewBox="0 0 200 140" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="sideSky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#7c3aed" stop-opacity="0" />
+            <stop offset="1" stop-color="#7c3aed" stop-opacity=".55" />
+          </linearGradient>
+          <linearGradient id="sideM" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#6d28d9" />
+            <stop offset="1" stop-color="#1e1038" />
+          </linearGradient>
+        </defs>
+        <rect width="200" height="140" fill="url(#sideSky)" />
+        <path d="M0 70 L30 42 L55 60 L85 26 L115 56 L140 36 L170 58 L200 34 L200 140 L0 140Z" fill="#4c1d95" opacity=".55" />
+        <path d="M0 92 L25 70 L50 86 L80 56 L110 88 L135 66 L165 90 L200 62 L200 140 L0 140Z" fill="url(#sideM)" opacity=".9" />
+        <path d="M0 112 L40 92 L70 106 L100 86 L140 110 L175 94 L200 104 L200 140 L0 140Z" fill="#0d0819" />
+      </svg>
+      <i data-icon="sprout" class="sprout"></i>
+      <p>Kỷ luật hôm nay,<br />Tự do ngày mai.</p>
+    </div>
+  </aside>
+  <div class="backdrop" id="backdrop"></div>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+    <header class="topbar">
+      <button class="icon-btn menu-btn" id="menuBtn" aria-label="Mở menu"><i data-icon="menu"></i></button>
+      <div class="greeting" id="greeting">Chào mừng trở lại, bro! 👋</div>
+      <div class="topbar-right">
+        <button class="date-pill" data-action="open-checkin" title="Điểm danh hôm nay">
+          <i data-icon="calendar"></i><span id="todayLabel"></span>
+        </button>
+        <button class="icon-btn" data-action="toggle-theme" id="themeBtn" title="Đổi giao diện sáng/tối"></button>
+        <a class="avatar" id="avatar" href="#settings" title="Hồ sơ">V</a>
+      </div>
+    </header>
+
+    <!-- ===== TỔNG QUAN ===== -->
+    <section class="page" data-page="overview">
+      <div class="hero">
+        <div class="hero-art" aria-hidden="true">
+          <div class="smoke s1"></div><div class="smoke s2"></div><div class="smoke s3"></div>
+          <img src="assets/hero.png" alt="" onerror="this.style.display='none'" />
+        </div>
+        <div class="hero-text">
+          <h1 class="hero-title"><span class="t1">KỶ LUẬT</span><span class="t2">là chìa khóa</span></h1>
+          <p class="hero-sub">Thắt chặt kỷ luật. Vượt qua giới hạn bản thân.</p>
+          <button class="btn btn-accent" data-action="open-checkin" id="heroBtn">
+            <span>Bắt đầu điểm danh</span><i data-icon="arrowRight"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-top">
+        <!-- Tiến độ hôm nay -->
+        <article class="card progress-card">
+          <header class="card-head"><h3><i data-icon="bars" class="head-ic"></i>Tiến độ hôm nay</h3></header>
+          <div class="progress-body">
+            <div class="ring">
+              <svg viewBox="0 0 120 120">
+                <defs>
+                  <linearGradient id="ringGrad" x1="0" y1="1" x2="1" y2="0">
+                    <stop offset="0" stop-color="#8b5cf6" />
+                    <stop offset=".6" stop-color="#a78bfa" />
+                    <stop offset="1" stop-color="#5eead4" />
+                  </linearGradient>
+                </defs>
+                <circle class="ring-bg" cx="60" cy="60" r="50" />
+                <circle class="ring-fg" id="ringFg" cx="60" cy="60" r="50" />
+              </svg>
+              <div class="ring-label"><b id="ringPct">0%</b><span>Hoàn thành</span></div>
+            </div>
+            <ul class="checklist" id="todayTasks"></ul>
+          </div>
+        </article>
+
+        <!-- Chuỗi kỷ luật -->
+        <article class="card streak-card" id="streakCard">
+          <header class="card-head">
+            <h3><span class="emoji">🔥</span>Chuỗi kỷ luật</h3>
+            <a href="#achievements" class="head-link" title="Xem thành tựu"><i data-icon="arrowRight"></i></a>
+          </header>
+          <div class="streak-body">
+            <div>
+              <div class="streak-num"><b id="streakNum">0</b><span>ngày</span><em class="delta" id="streakDelta">▲ +1</em></div>
+              <div class="record">👑 Kỷ lục cá nhân: <b id="bestStreak">0</b> ngày</div>
+            </div>
+            <div class="flame-wrap" aria-hidden="true">
+              <svg viewBox="0 0 170 140" class="flame-svg">
+                <defs>
+                  <radialGradient id="flameG" cx="50%" cy="72%" r="65%">
+                    <stop offset="0" stop-color="#f5f3ff" />
+                    <stop offset=".35" stop-color="#c084fc" />
+                    <stop offset=".75" stop-color="#7c3aed" />
+                    <stop offset="1" stop-color="#4c1d95" />
+                  </radialGradient>
+                  <filter id="flameGlow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="7" result="b" />
+                    <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+                  </filter>
+                </defs>
+                <ellipse cx="85" cy="96" rx="72" ry="20" fill="none" stroke="#a78bfa" stroke-width="2.2" opacity=".55" transform="rotate(-14 85 96)" />
+                <g class="flame-body" filter="url(#flameGlow)">
+                  <path fill="url(#flameG)" d="M85 14 C 93 38, 120 52, 117 86 C 115 110, 100 122, 85 122 C 65 122, 50 108, 50 88 C 50 70, 61 60, 65 46 C 69 58, 73 63, 78 66 C 76 48, 78 32, 85 14 Z" />
+                  <path fill="#faf5ff" opacity=".9" d="M85 64 C 89 76, 101 82, 99 98 C 97 109, 91 114, 85 114 C 76 114, 70 107, 70 98 C 70 89, 76 85, 78 79 C 80 85, 82 87, 84 87 C 83 79, 82 72, 85 64 Z" />
+                </g>
+                <path d="M20 108 A 72 20 -14 0 0 150 78" fill="none" stroke="#c4b5fd" stroke-width="2.4" opacity=".9" />
+                <path class="spark" d="M30 60 l2 6 6 2 -6 2 -2 6 -2 -6 -6 -2 6 -2z" fill="#c4b5fd" />
+                <path class="spark sp2" d="M145 40 l1.5 4 4 1.5 -4 1.5 -1.5 4 -1.5 -4 -4 -1.5 4 -1.5z" fill="#e9d5ff" />
+              </svg>
+            </div>
+          </div>
+          <div class="streak-quote" id="streakQuote">“ Tiếp tục cố gắng, bro! 💪</div>
+        </article>
+
+        <!-- Lịch tháng -->
+        <article class="card cal-card">
+          <header class="card-head">
+            <h3><i data-icon="calendar" class="head-ic"></i><span id="miniCalTitle">Lịch trình tháng</span></h3>
+            <div class="cal-nav">
+              <button class="round-btn" data-action="cal-prev" data-cal="mini" aria-label="Tháng trước"><i data-icon="chevL"></i></button>
+              <button class="round-btn" data-action="cal-next" data-cal="mini" aria-label="Tháng sau"><i data-icon="chevR"></i></button>
+            </div>
+          </header>
+          <div class="calendar" id="miniCal"></div>
+        </article>
+      </div>
+
+      <div class="grid grid-bottom">
+        <!-- Hoạt động gần đây -->
+        <article class="card activity-card">
+          <header class="card-head">
+            <h3><i data-icon="history" class="head-ic"></i>Hoạt động gần đây</h3>
+            <a href="#activity" class="text-link">Xem tất cả <i data-icon="arrowRight"></i></a>
+          </header>
+          <ul class="timeline" id="recentActivity"></ul>
+        </article>
+
+        <!-- Thống kê nhanh -->
+        <article class="card quick-card">
+          <header class="card-head">
+            <h3><i data-icon="users" class="head-ic"></i>Thống kê nhanh</h3>
+            <div class="seg" id="quickSeg">
+              <button data-action="quick-range" data-range="7" class="active">7 ngày</button>
+              <button data-action="quick-range" data-range="30">30 ngày</button>
+              <button data-action="quick-range" data-range="month">Tháng</button>
+            </div>
+          </header>
+          <div class="quick-stats" id="quickStats"></div>
+          <div class="chart" id="quickChart"></div>
+        </article>
+
+        <!-- Quote -->
+        <article class="card quote-card" data-action="next-quote" title="Bấm để đổi câu trích dẫn">
+          <svg class="quote-bg" viewBox="0 0 380 240" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <defs>
+              <linearGradient id="qSky" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#1a0f33" />
+                <stop offset=".6" stop-color="#4c1d95" />
+                <stop offset="1" stop-color="#7c3aed" />
+              </linearGradient>
+              <radialGradient id="qGlow" cx="75%" cy="55%" r="50%">
+                <stop offset="0" stop-color="#a78bfa" stop-opacity=".8" />
+                <stop offset="1" stop-color="#a78bfa" stop-opacity="0" />
+              </radialGradient>
+            </defs>
+            <rect width="380" height="240" fill="url(#qSky)" />
+            <rect width="380" height="240" fill="url(#qGlow)" />
+            <path d="M0 170 L60 140 L110 160 L170 120 L230 150 L290 110 L380 140 L380 240 L0 240Z" fill="#5b21b6" opacity=".55" />
+            <path d="M0 200 L70 175 L130 195 L200 165 L260 190 L300 170 L380 185 L380 240 L0 240Z" fill="#2e1065" opacity=".85" />
+            <path d="M290 240 L300 170 L318 150 L345 146 L360 160 L380 150 L380 240Z" fill="#0b0616" />
+            <g fill="#0b0616">
+              <circle cx="331" cy="112" r="4.2" />
+              <path d="M326 118 h10 l2 16 -3 0 -1 14 -2.5 0 -0.5 -12 -0.5 12 -2.5 0 -1 -14 -3 0z" />
+            </g>
+          </svg>
+          <div class="quote-content">
+            <blockquote id="quoteText"></blockquote>
+            <cite id="quoteAuthor"></cite>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Các trang khác do JS render -->
+    <section class="page" data-page="schedule" id="page-schedule"></section>
+    <section class="page" data-page="stats" id="page-stats"></section>
+    <section class="page" data-page="achievements" id="page-achievements"></section>
+    <section class="page" data-page="activity" id="page-activity"></section>
+    <section class="page" data-page="settings" id="page-settings"></section>
+  </main>
+</div>
+
+<!-- Modal -->
+<div class="modal" id="modal" aria-hidden="true">
+  <div class="modal-box" id="modalBox" role="dialog" aria-modal="true"></div>
+</div>
+<input type="file" id="importFile" accept="application/json" hidden />
+<div class="toasts" id="toasts"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
