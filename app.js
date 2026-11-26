@@ -833,14 +833,16 @@
           <form data-form="tasks">
             ${state.tasks.map((t) => `
               <div class="task-edit">
-                <input class="input emoji-in" name="emoji-${t.id}" value="${esc(t.emoji || '')}" maxlength="4">
+                <button type="button" class="input emoji-in" data-action="emoji-pick" data-task-id="${t.id}" title="Chọn emoji">${esc(t.emoji || '➕')}</button>
+                <input type="hidden" name="emoji-${t.id}" value="${esc(t.emoji || '')}">
                 <input class="input" name="name-${t.id}" value="${esc(t.name)}" maxlength="60" required>
                 <button type="button" class="mini-btn" data-action="del-task" data-id="${t.id}" aria-label="Xóa">${icon('trash')}</button>
               </div>`).join('')}
             ${state.tasks.length ? `<div class="btn-row" style="margin-bottom:18px"><button class="btn btn-primary btn-sm" type="submit">${icon('check')} Lưu tên mục</button></div>` : ''}
           </form>
           <form class="inline-form" data-form="add-task">
-            <input class="input emoji-in" name="emoji" placeholder="🎯" maxlength="4" style="flex:0 0 52px;text-align:center">
+            <button type="button" class="input emoji-in" data-action="emoji-pick" title="Chọn emoji">🎯</button>
+            <input type="hidden" name="emoji" value="🎯">
             <input class="input" name="name" placeholder="Thêm mục kỷ luật mới..." required maxlength="60">
             <button class="btn btn-primary btn-sm" type="submit">${icon('plus')} Thêm</button>
           </form>
@@ -869,6 +871,7 @@
   const ACTIONS = {
     'open-checkin': (el) => openCheckin(el.dataset.date || todayKey()),
     'modal-close': closeModal,
+    'emoji-pick': (el) => picker.toggle(el),
     'toggle-task': (el) => toggleTask(el.dataset.date, el.dataset.id),
     'toggle-theme': () => { state.settings.theme = state.settings.theme === 'dark' ? 'light' : 'dark'; commit(); },
     'toggle-setting': (el) => { state.settings[el.dataset.key] = !state.settings[el.dataset.key]; commit(); },
@@ -1020,6 +1023,137 @@
     },
   };
 
+  /* ================= EMOJI PICKER (kiểu bàn phím emoji iOS) ================= */
+  const EMOJI_CATS = [
+    { id: 'recent', icon: '🕘', name: 'Thường dùng' },
+    { id: 'smileys', icon: '😀', name: 'Mặt cười & Người', list: '😀 😃 😄 😁 😆 😅 🤣 😂 🙂 🙃 😉 😊 😇 🥰 😍 🤩 😘 😋 😛 😜 🤪 😝 🤑 🤗 🤭 🤫 🤔 🤐 🤨 😐 😑 😶 😏 😒 🙄 😬 😌 😔 😪 🤤 😴 😷 🤒 🤕 🤢 🤮 🥵 🥶 🥴 😵 🤯 🤠 🥳 😎 🤓 🧐 😕 😟 🙁 😮 😯 😲 😳 🥺 😦 😧 😨 😰 😥 😢 😭 😱 😖 😣 😞 😓 😩 😫 🥱 😤 😡 😠 🤬 😈 👿 💀 💩 🤡 👻 👽 🤖 👋 🤚 ✋ 🖖 👌 🤏 ✌️ 🤞 🤟 🤘 🤙 👈 👉 👆 👇 👍 👎 ✊ 👊 👏 🙌 👐 🤲 🤝 🙏 ✍️ 💅 💪 🦾 🧠 👀 👶 🧒 👦 👧 🧑 👨 👩 🧓 👴 👵 🧘 🏃 🚶 🧍 🏋️ 🤸 🚴 🏊 🧗' },
+    { id: 'nature', icon: '🐻', name: 'Động vật & Thiên nhiên', list: '🐶 🐱 🐭 🐹 🐰 🦊 🐻 🐼 🐨 🐯 🦁 🐮 🐷 🐸 🐵 🐔 🐧 🐦 🐤 🦆 🦅 🦉 🦇 🐺 🐗 🐴 🦄 🐝 🐛 🦋 🐌 🐞 🐜 🐢 🐍 🦎 🐙 🦑 🦀 🐠 🐟 🐬 🐳 🐋 🦈 🐊 🐅 🐆 🦓 🦍 🐘 🦒 🐪 🦘 🐎 🐕 🐈 🌵 🎄 🌲 🌳 🌴 🌱 🌿 ☘️ 🍀 🍃 🍂 🍁 🍄 🌾 💐 🌷 🌹 🥀 🌺 🌸 🌼 🌻 🌞 🌝 🌛 🌙 🌎 🪐 ⭐ 🌟 ✨ ⚡ 🔥 💥 ☀️ 🌤️ ⛅ 🌧️ ⛈️ ❄️ ☃️ 🌊 💧 🌈' },
+    { id: 'food', icon: '🍔', name: 'Đồ ăn & Thức uống', list: '🍏 🍎 🍐 🍊 🍋 🍌 🍉 🍇 🍓 🫐 🍈 🍒 🍑 🥭 🍍 🥥 🥝 🍅 🍆 🥑 🥦 🥬 🥒 🌶️ 🌽 🥕 🧄 🧅 🥔 🍠 🥐 🍞 🥖 🥨 🧀 🥚 🍳 🥞 🥓 🥩 🍗 🍖 🌭 🍔 🍟 🍕 🥪 🌮 🌯 🥗 🥘 🍝 🍜 🍲 🍛 🍣 🍱 🥟 🍤 🍙 🍚 🍘 🍥 🍢 🍡 🍧 🍨 🍦 🥧 🧁 🍰 🎂 🍮 🍭 🍬 🍫 🍿 🍩 🍪 🥜 🍯 🥛 ☕ 🍵 🧃 🥤 🧋 🍶 🍺 🍷 🧊' },
+    { id: 'activity', icon: '⚽', name: 'Hoạt động', list: '⚽ 🏀 🏈 ⚾ 🥎 🎾 🏐 🏉 🥏 🎱 🏓 🏸 🏒 🏑 🥍 🏏 🥅 ⛳ 🏹 🎣 🥊 🥋 🎽 🛹 ⛸️ 🥌 🎿 ⛷️ 🏂 🏋️ 🤼 🤸 🤺 🧘 🏄 🏊 🚣 🧗 🚵 🚴 🏆 🥇 🥈 🥉 🏅 🎖️ 🎗️ 🎫 🎪 🎭 🎨 🎬 🎤 🎧 🎼 🎹 🥁 🎷 🎺 🎸 🎻 🎲 ♟️ 🎯 🎳 🎮 🧩' },
+    { id: 'travel', icon: '🚗', name: 'Du lịch & Địa điểm', list: '🚗 🚕 🚙 🚌 🏎️ 🚓 🚑 🚒 🚚 🚲 🛴 🛵 🏍️ 🚨 🚆 🚇 🚊 ✈️ 🛫 🛬 🚀 🛸 🚁 ⛵ 🚤 🛳️ ⚓ ⛽ 🚦 🗺️ 🗽 🗼 🏰 🏯 🏟️ 🎡 🎢 🎠 ⛲ 🏖️ 🏝️ 🏜️ 🌋 ⛰️ 🏔️ 🗻 🏕️ ⛺ 🏠 🏡 🏢 🏬 🏥 🏦 🏨 🏫 ⛪ 🕌 🛕 🌅 🌄 🌠 🎇 🎆 🌇 🌆 🏙️ 🌃 🌌 🌉' },
+    { id: 'objects', icon: '💡', name: 'Đồ vật', list: '⌚ 📱 💻 ⌨️ 🖥️ 🖨️ 🖱️ 💾 💿 📷 📹 🎥 📞 ☎️ 📺 📻 🎙️ ⏱️ ⏲️ ⏰ 🕰️ ⌛ ⏳ 📡 🔋 🔌 💡 🔦 🕯️ 💸 💵 💰 💳 💎 ⚖️ 🔧 🔨 🛠️ ⚙️ 🧱 🔑 🗝️ 🚪 🛏️ 🛋️ 🚿 🛁 🧴 🧹 🧺 🧼 🪥 🛒 🎁 🎈 🎉 🎊 ✉️ 📦 📝 📒 📕 📗 📘 📙 📚 📖 🔖 📎 📌 📍 ✂️ 🖊️ ✏️ 🖍️ 🔍 🔒 🔓 📅 📆 🗓️ 📈 📉 📊 📋 🗂️ 💼 🎒 👓 🕶️ 👕 👖 👗 👟 👞 🧢 💄 💍 🩺 💊 💉 🧬 🔬 🔭' },
+    { id: 'symbols', icon: '🔣', name: 'Biểu tượng', list: '❤️ 🧡 💛 💚 💙 💜 🖤 🤍 🤎 💔 ❣️ 💕 💞 💓 💗 💖 💘 💝 💟 ☮️ ☯️ ♈ ♉ ♊ ♋ ♌ ♍ ♎ ♏ ♐ ♑ ♒ ♓ 🆔 ⚛️ 🆚 💮 🅰️ 🅱️ 🆎 🆑 🅾️ 🆘 ❌ ⭕ 🛑 ⛔ 📛 🚫 💯 💢 ♨️ 📵 🚭 ❗ ❕ ❓ ❔ ‼️ ⁉️ 🔅 🔆 ⚠️ 🔱 ⚜️ 🔰 ♻️ ✅ ❇️ ✳️ ❎ 🌐 💠 🌀 💤 ♿ 🅿️ 🆗 🆙 🆒 🆕 🆓 0️⃣ 1️⃣ 2️⃣ 3️⃣ 4️⃣ 5️⃣ 6️⃣ 7️⃣ 8️⃣ 9️⃣ 🔟 ▶️ ⏸️ ⏹️ ⏺️ ⏭️ ⏮️ ⏩ ⏪ 🔀 🔁 🔂 ➕ ➖ ➗ ✖️ ♾️ 💲 ✔️ ☑️ 🔘 🔴 🟠 🟡 🟢 🔵 🟣 ⚫ ⚪ 🟥 🟧 🟨 🟩 🟦 🟪 ⬛ ⬜ 🔶 🔷 🔺 🔻 💬 💭 🔔 🔕 📣 📢 🏁 🚩' },
+  ];
+  // Từ khóa tìm kiếm (tiếng Việt không dấu + tiếng Anh) cho các emoji hay dùng khi đặt thói quen
+  const EMOJI_KEYWORDS = {
+    'thuc day bao thuc wake alarm sang dong ho': '⏰ ⏱️ 🌅 🌄 ☀️ 🌞 🐓 🛏️',
+    'ngu sleep dem toi moon': '🌙 😴 🛏️ 💤 🌛 🌃 🌌',
+    'hoc study sach book doc read viet': '📚 📖 📝 ✏️ 🖊️ 📒 🎓 🧠 💻 📘',
+    'tap gym the duc sport workout chay run': '💪 🏋️ 🏃 🤸 🧘 🚴 🏊 ⚽ 🏀 🥊 🔥 👟',
+    'an eat healthy rau food lanh manh': '🥗 🥦 🍎 🥑 🥕 🍌 🍳 🥚 🍓 🥬',
+    'nuoc water uong drink': '💧 🥤 🥛 🍵 ☕ 🧊 🌊',
+    'thien meditation yoga binh tam': '🧘 🕯️ 🌿 ☮️ 🌸 🙏',
+    'tien money tiet kiem save': '💰 💵 💳 💸 🏦 📈',
+    'lam viec work cong viec code': '💻 💼 📊 📈 🖥️ ⌨️ 📋 ⚙️',
+    'tim heart yeu love': '❤️ 💜 💙 💚 💛 🧡 💖 💕',
+    'muc tieu goal target thanh cong': '🎯 🏆 🥇 🏅 ✅ 💯 ⭐ 🚀',
+    'nhac music dan': '🎵 🎧 🎸 🎹 🎤 🎻 🥁',
+    've art paint sang tao': '🎨 🖌️ 🖍️ ✏️ 🎭',
+    'gia dinh family ban be friend': '👨 👩 👴 👵 👶 🤝 🏠',
+    'don dep clean nha': '🧹 🧺 🧼 🛁 🏠 🪥',
+    'thuoc medicine suc khoe health': '💊 🩺 💉 ❤️ 🧬',
+    'khong dien thoai no phone': '📵 📱 🚫',
+    'lua fire streak': '🔥 ⚡ 💥 ✨',
+  };
+  const stripVN = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
+  const RECENT_KEY = 'discipline-recent-emoji';
+
+  const picker = (() => {
+    let el = null, target = null;
+    const getRecent = () => { try { return JSON.parse(localStorage.getItem(RECENT_KEY)) || []; } catch { return []; } };
+    const pushRecent = (e) => { const r = [e, ...getRecent().filter((x) => x !== e)].slice(0, 32); localStorage.setItem(RECENT_KEY, JSON.stringify(r)); };
+    const defaultRecent = ['⏰', '📚', '💪', '🥗', '🌙', '💧', '🧘', '🏃', '📖', '🎯', '🔥', '✅', '💻', '🙏', '🚀', '⭐'];
+    const grid = (list) => list.map((e) => `<button type="button" class="ep-emoji" data-emoji="${e}">${e}</button>`).join('');
+
+    function body() {
+      const recent = getRecent();
+      return EMOJI_CATS.map((c) => {
+        const list = c.id === 'recent' ? (recent.length ? recent : defaultRecent) : c.list.split(' ');
+        return `<section class="ep-section" data-sec="${c.id}"><h5>${c.name}</h5><div class="ep-grid">${grid(list)}</div></section>`;
+      }).join('');
+    }
+    function build() {
+      el = document.createElement('div');
+      el.className = 'emoji-picker';
+      el.innerHTML = `
+        <div class="ep-search">${icon('target')}<input type="text" placeholder="Tìm emoji (vd: học, ngủ, gym, nước...)" aria-label="Tìm emoji"></div>
+        <div class="ep-body"></div>
+        <div class="ep-tabs">${EMOJI_CATS.map((c) => `<button type="button" data-cat="${c.id}" title="${c.name}">${c.icon}</button>`).join('')}
+          <button type="button" class="ep-clear" data-clear title="Xóa emoji">⌫</button></div>`;
+      el.querySelector('.ep-search .ic').outerHTML = '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>';
+      document.body.appendChild(el);
+      const bodyEl = el.querySelector('.ep-body');
+      const input = el.querySelector('.ep-search input');
+
+      el.addEventListener('click', (e) => {
+        const em = e.target.closest('[data-emoji]');
+        if (em) return choose(em.dataset.emoji);
+        if (e.target.closest('[data-clear]')) return choose('');
+        const cat = e.target.closest('[data-cat]');
+        if (cat) {
+          input.value = ''; bodyEl.innerHTML = body();
+          const sec = bodyEl.querySelector(`[data-sec="${cat.dataset.cat}"]`);
+          if (sec) bodyEl.scrollTo({ top: sec.offsetTop - bodyEl.offsetTop, behavior: 'smooth' });
+        }
+      });
+      bodyEl.addEventListener('scroll', () => {
+        let cur = 'recent';
+        bodyEl.querySelectorAll('.ep-section').forEach((s) => { if (s.offsetTop - bodyEl.offsetTop <= bodyEl.scrollTop + 10) cur = s.dataset.sec; });
+        el.querySelectorAll('[data-cat]').forEach((b) => b.classList.toggle('active', b.dataset.cat === cur));
+      });
+      input.addEventListener('input', () => {
+        const q = stripVN(input.value.trim());
+        if (!q) { bodyEl.innerHTML = body(); return; }
+        const found = new Set();
+        Object.entries(EMOJI_KEYWORDS).forEach(([k, v]) => { if (k.split(' ').some((w) => w.startsWith(q) || q.split(' ').some((p) => p && w.startsWith(p)))) v.split(' ').forEach((x) => found.add(x)); });
+        EMOJI_CATS.forEach((c) => { if (c.list && stripVN(c.name).includes(q)) c.list.split(' ').forEach((x) => found.add(x)); });
+        bodyEl.innerHTML = found.size
+          ? `<section class="ep-section"><h5>Kết quả</h5><div class="ep-grid">${grid([...found])}</div></section>`
+          : '<p class="ep-empty">Không tìm thấy emoji phù hợp</p>';
+        bodyEl.scrollTop = 0;
+      });
+    }
+    function choose(emoji) {
+      if (!target) return close();
+      const hidden = target.nextElementSibling;
+      const isAdd = !target.dataset.taskId;
+      const val = emoji || (isAdd ? '🎯' : '');
+      target.textContent = val || '➕';
+      if (hidden && hidden.type === 'hidden') hidden.value = val;
+      if (emoji) pushRecent(emoji);
+      const t = state.tasks.find((x) => x.id === target.dataset.taskId);
+      if (t) { t.emoji = val; save(); toast(`Đã đổi biểu tượng: ${val || '(trống)'} ${t.name}`, 'success', 'check'); }
+      close();
+    }
+    function open(btn) {
+      if (!el) build();
+      target = btn;
+      const input = el.querySelector('.ep-search input');
+      input.value = '';
+      el.querySelector('.ep-body').innerHTML = body();
+      el.querySelector('.ep-body').scrollTop = 0;
+      el.querySelectorAll('[data-cat]').forEach((b) => b.classList.toggle('active', b.dataset.cat === 'recent'));
+      el.classList.add('open');
+      const mobile = window.innerWidth < 640;
+      el.classList.toggle('sheet', mobile);
+      if (!mobile) {
+        const r = btn.getBoundingClientRect();
+        const w = el.offsetWidth, h = el.offsetHeight;
+        let left = Math.min(Math.max(8, r.left), window.innerWidth - w - 8);
+        let top = r.bottom + 8;
+        if (top + h > window.innerHeight - 8) top = Math.max(8, r.top - h - 8);
+        el.style.left = left + 'px'; el.style.top = top + 'px';
+        setTimeout(() => input.focus(), 30);
+      } else { el.style.left = ''; el.style.top = ''; }
+    }
+    function close() { if (el) el.classList.remove('open'); target = null; }
+    return {
+      toggle: (btn) => (el && el.classList.contains('open') && target === btn ? close() : open(btn)),
+      close,
+      isOpen: () => !!(el && el.classList.contains('open')),
+    };
+  })();
+
   /* ================= EVENTS ================= */
   document.addEventListener('click', (e) => {
     const el = e.target.closest('[data-action]');
@@ -1032,7 +1166,11 @@
     if (fn) { e.preventDefault(); fn(e.target); }
   });
   $('#modal').addEventListener('click', (e) => { if (e.target.id === 'modal') closeModal(); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (picker.isOpen()) picker.close(); else closeModal(); } });
+  document.addEventListener('click', (e) => { if (picker.isOpen() && !e.target.closest('.emoji-picker, [data-action="emoji-pick"]')) picker.close(); });
+  // Chỉ đóng khi đổi chiều ngang (bàn phím điện thoại bật lên chỉ đổi chiều cao)
+  let lastW = window.innerWidth;
+  window.addEventListener('resize', () => { if (window.innerWidth !== lastW) { lastW = window.innerWidth; picker.close(); } });
   $('#menuBtn').addEventListener('click', () => { $('#sidebar').classList.add('open'); $('#backdrop').classList.add('show'); });
   $('#backdrop').addEventListener('click', () => { $('#sidebar').classList.remove('open'); $('#backdrop').classList.remove('show'); });
   $('#importFile').addEventListener('change', (e) => {

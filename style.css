@@ -620,6 +620,50 @@ input[type='time']::-webkit-calendar-picker-indicator { filter: invert(0.7); }
 .task-edit .input.emoji-in { flex: 0 0 52px; text-align: center; padding: 10px 6px; }
 .btn-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
 
+/* ================= EMOJI PICKER (iOS style) ================= */
+.input.emoji-in {
+  flex: 0 0 52px !important; width: 52px; height: 42px; padding: 0;
+  display: grid; place-items: center; font-size: 22px; line-height: 1; cursor: pointer;
+  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
+}
+.input.emoji-in:hover { border-color: var(--primary-2); background: rgba(139, 92, 246, 0.15); }
+.emoji-picker {
+  --ep-bg: #1c1c1e; --ep-bar: #2c2c2e; --ep-text: #f2f2f7; --ep-sub: #8e8e93; --ep-hl: #3a3a3c;
+  position: fixed; z-index: 300; width: 352px; height: 400px;
+  display: flex; flex-direction: column;
+  background: var(--ep-bg); color: var(--ep-text);
+  border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.7);
+  opacity: 0; pointer-events: none; transform: translateY(6px) scale(0.98);
+  transition: opacity 0.18s, transform 0.18s;
+  font-family: -apple-system, 'SF Pro Text', var(--font);
+  overflow: hidden;
+}
+[data-theme='light'] .emoji-picker { --ep-bg: #f2f2f7; --ep-bar: #e5e5ea; --ep-text: #1c1c1e; --ep-sub: #6e6e73; --ep-hl: #d1d1d6; }
+.emoji-picker.open { opacity: 1; pointer-events: auto; transform: none; }
+.ep-search { display: flex; align-items: center; gap: 8px; margin: 10px 10px 4px; padding: 0 10px; height: 36px; border-radius: 10px; background: var(--ep-bar); color: var(--ep-sub); }
+.ep-search .ic { width: 16px; height: 16px; }
+.ep-search input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--ep-text); font-size: 14px; }
+.ep-search input::placeholder { color: var(--ep-sub); }
+.ep-body { flex: 1; overflow-y: auto; padding: 0 8px 8px; position: relative; }
+.ep-section h5 { position: sticky; top: 0; z-index: 1; background: var(--ep-bg); font-size: 11px; font-weight: 600; letter-spacing: 0.4px; text-transform: uppercase; color: var(--ep-sub); padding: 10px 4px 6px; }
+.ep-grid { display: grid; grid-template-columns: repeat(8, 1fr); }
+.ep-emoji {
+  aspect-ratio: 1; display: grid; place-items: center; border-radius: 8px;
+  font-size: 26px; line-height: 1; transition: background 0.12s, transform 0.12s;
+  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
+}
+.ep-emoji:hover { background: var(--ep-hl); transform: scale(1.15); }
+.ep-emoji:active { transform: scale(0.9); }
+.ep-empty { text-align: center; color: var(--ep-sub); font-size: 13px; padding: 40px 0; }
+.ep-tabs { display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; background: var(--ep-bar); border-top: 1px solid rgba(255, 255, 255, 0.06); }
+.ep-tabs button { width: 34px; height: 32px; border-radius: 8px; font-size: 18px; opacity: 0.5; filter: grayscale(0.6); transition: all 0.15s; font-family: 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif; }
+.ep-tabs button:hover { opacity: 0.9; }
+.ep-tabs button.active { opacity: 1; filter: none; background: var(--ep-hl); }
+.ep-tabs .ep-clear { opacity: 0.8; filter: none; font-size: 17px; color: var(--ep-text); }
+.emoji-picker.sheet { left: 0 !important; right: 0; bottom: 0; top: auto !important; width: 100%; height: 52vh; border-radius: 18px 18px 0 0; }
+.emoji-picker.sheet .ep-grid { grid-template-columns: repeat(8, 1fr); }
+
 /* ================= MODAL ================= */
 .modal {
   position: fixed; inset: 0; z-index: 100;
